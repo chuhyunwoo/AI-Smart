@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f7f5f2">
+    <meta name="description" content="브라우저에서 표정 변화를 기록하고 오늘의 흐름을 돌아보는 개인용 대시보드">
+    <title>오늘의 표정 노트</title>
+    <link rel="stylesheet" href="styles.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+    <script defer src="app.js"></script>
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="#" aria-label="오늘의 표정 노트 홈">
+          <span class="brand-mark" aria-hidden="true">✳</span>
+          <span>mood note</span>
+        </a>
+        <span class="privacy-pill"><span aria-hidden="true">●</span> 내 기기에만 저장돼요</span>
+      </header>
+
+      <section class="intro" aria-labelledby="page-title">
+        <p class="eyebrow">A LITTLE CHECK-IN WITH YOURSELF</p>
+        <h1 id="page-title">오늘의 표정 노트<span class="title-dot">.</span></h1>
+        <p class="intro-copy">표정을 가볍게 기록하고, 오늘의 순간들을 돌아봐요.</p>
+        <p class="today-date" id="today-date"></p>
+      </section>
+
+      <section class="dashboard" aria-label="오늘의 표정 기록 대시보드">
+        <article class="card camera-card">
+          <div class="card-heading">
+            <div>
+              <p class="section-kicker">LIVE CHECK-IN</p>
+              <h2>지금의 표정</h2>
+            </div>
+            <span class="live-indicator" id="camera-indicator">
+              <span class="indicator-dot"></span>
+              <span id="camera-state">카메라 꺼짐</span>
+            </span>
+          </div>
+
+          <div class="camera-frame" id="camera-frame">
+            <video id="camera" autoplay muted playsinline aria-label="내 카메라 미리보기"></video>
+            <div class="camera-placeholder" id="camera-placeholder">
+              <span class="camera-icon" aria-hidden="true">◉</span>
+              <strong>카메라를 켜고 오늘을 기록해 보세요</strong>
+              <span>표정 분석은 이 브라우저에서만 진행돼요.</span>
+            </div>
+            <div class="expression-badge" id="expression-badge" hidden>
+              <span id="expression-emoji" aria-hidden="true"></span>
+              <span id="expression-label"></span>
+              <span class="expression-confidence" id="expression-confidence"></span>
+            </div>
+          </div>
+
+          <p class="status-message" id="status-message" role="status" aria-live="polite">
+            AI 모델을 준비하고 있어요.
+          </p>
+          <div class="camera-actions">
+            <button class="button button-primary" id="camera-button" type="button" disabled>
+              카메라 시작하기
+            </button>
+            <button class="button button-secondary" id="check-in-button" type="button" disabled>
+              지금 기록하기
+            </button>
+          </div>
+          <p class="helper-copy">카메라를 켜면 3초마다 표정을 기록해요. 원할 때 언제든 멈출 수 있어요.</p>
+          <button class="text-button retry-button" id="retry-models-button" type="button" hidden>
+            모델 다시 불러오기
+          </button>
+        </article>
+
+        <article class="card summary-card">
+          <div class="card-heading">
+            <div>
+              <p class="section-kicker">TODAY, SO FAR</p>
+              <h2>오늘의 감정 날씨</h2>
+            </div>
+            <span class="weather-icon" aria-hidden="true">☀</span>
+          </div>
+
+          <div class="summary-copy" id="summary-copy">
+            <span class="summary-emoji" id="summary-emoji" aria-hidden="true">☁️</span>
+            <div>
+              <p class="summary-title" id="summary-title">아직 기록이 없어요</p>
+              <p class="summary-description" id="summary-description">카메라를 켜거나 지금 표정을 기록해 보세요.</p>
+            </div>
+          </div>
+
+          <div class="stat-row">
+            <div>
+              <span class="stat-label">오늘의 기록</span>
+              <strong class="stat-value"><span id="record-count">0</span><small>회</small></strong>
+            </div>
+            <div class="stat-divider" aria-hidden="true"></div>
+            <div>
+              <span class="stat-label">가장 많이 관찰된 표정</span>
+              <strong class="stat-value" id="dominant-emotion">—</strong>
+            </div>
+          </div>
+
+          <div class="chart-section">
+            <div class="chart-heading">
+              <h3>표정 기록</h3>
+              <span id="chart-caption">기록이 쌓이면 여기에 보여요</span>
+            </div>
+            <div class="emotion-list" id="emotion-list">
+              <p class="empty-chart">아직 표시할 기록이 없어요.</p>
+            </div>
+          </div>
+          <p class="disclaimer">
+            표정 분석 결과는 감정을 확정하거나 진단하지 않아요. 실제 기분과 다를 수 있으니 가벼운 참고용으로만 봐주세요.
+          </p>
+        </article>
+
+        <article class="card timeline-card">
+          <div class="card-heading timeline-heading">
+            <div>
+              <p class="section-kicker">LITTLE MOMENTS</p>
+              <h2>시간별 기록</h2>
+            </div>
+            <button class="text-button" id="clear-button" type="button" disabled>오늘 기록 지우기</button>
+          </div>
+          <div class="timeline-list" id="timeline-list">
+            <p class="empty-timeline">표정을 기록하면 시간대별 흐름이 여기에 쌓여요.</p>
+          </div>
+        </article>
+      </section>
+
+      <footer class="footer">
+        <span>오늘의 기록은 이 브라우저의 기기에만 저장돼요.</span>
+        <span>나를 알아가는 작은 순간들</span>
+      </footer>
+    </main>
+  </body>
+</html>
